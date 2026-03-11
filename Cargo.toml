@@ -1,7 +1,8 @@
 [package]
 name = "fs-standardizer"
 version = "0.1.0"
-edition = "2024"
+edition = "2021"
+authors = ["YVV <yvv4recon@gmail.com>"]
 
 [dependencies]
 clap = { version = "4.5", features = ["derive"] }
