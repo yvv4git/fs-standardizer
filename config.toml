@@ -42,6 +42,10 @@ pattern = "_+ "
 replacement = "_"
 
 [[rules]]
+pattern = "_+_"
+replacement = "_"
+
+[[rules]]
 pattern = "'"
 replacement = ""
 
