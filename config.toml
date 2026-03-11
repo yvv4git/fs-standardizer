@@ -1,0 +1,82 @@
+# Configuration file for fs-standardizer
+# Uses Rust regex syntax (regex crate)
+# Documentation: https://docs.rs/regex/latest/regex/
+# Standard: similar to PCRE (Perl Compatible Regular Expressions)
+#
+# Features:
+#   \d - digits (0-9)
+#   \w - word characters (a-z, A-Z, 0-9, _)
+#   \s - whitespace characters
+#   .  - any character
+#   *  - 0 or more repetitions
+#   +  - 1 or more repetitions
+#   ?  - 0 or 1 repetition
+#   [] - character class
+#   () - capture group
+#   |  - alternation (or)
+#   ^  - start of string
+#   $  - end of string
+
+[[rules]]
+pattern = "|"
+replacement = ""
+
+[[rules]]
+pattern = "_–_"
+replacement = "_"
+
+[[rules]]
+pattern = "[-\\(\\)\\&\\,\\s]"
+replacement = "_"
+
+[[rules]]
+pattern = "[\\[\\]\\(\\)]"
+replacement = ""
+
+[[rules]]
+pattern = "\\._"
+replacement = "_"
+
+[[rules]]
+pattern = "_+"
+replacement = "_"
+
+[[rules]]
+pattern = "'"
+replacement = ""
+
+[[rules]]
+pattern = "_\\."
+replacement = "."
+
+[[rules]]
+pattern = "\\@bzd_channel"
+replacement = ""
+
+[[rules]]
+pattern = "PDF"
+replacement = "pdf"
+
+[[rules]]
+pattern = "DJVU"
+replacement = "djvu"
+
+[[rules]]
+pattern = "EPUB"
+replacement = "epub"
+
+[[rules]]
+pattern = "\\@"
+replacement = ""
+
+[[rules]]
+pattern = "YT2mp3.info_"
+replacement = ""
+
+[[rules]]
+pattern = "t.me_"
+replacement = ""
+
+[[rules]]
+pattern = "Y2Mate.is_"
+replacement = ""
