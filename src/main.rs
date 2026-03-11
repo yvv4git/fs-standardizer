@@ -6,10 +6,9 @@ pub mod adapters;
 use clap::Parser;
 use std::path::PathBuf;
 use usecases::scan::scan_directory;
-use config::config::{AppConfig, RenameRule};
-use ports::FileSystem;
+use usecases::rename_files::rename_files;
+use config::config::AppConfig;
 use adapters::FsAdapter;
-use regex::Regex;
 
 #[derive(Parser)]
 #[command(name = "fs-standardizer")]
@@ -36,23 +35,13 @@ struct Cli {
     fake: bool,
 }
 
-fn apply_rules(filename: &str, rules: &[RenameRule]) -> String {
-    let mut result = filename.to_string();
-    
-    for rule in rules {
-        if let Ok(re) = Regex::new(&rule.pattern) {
-            result = re.replace_all(&result, rule.replacement.as_str()).to_string();
-        }
-    }
-    
-    result
-}
-
 fn main() {
     let cli = Cli::parse();
 
+    // Infrastructure - create adapters
     let fs = FsAdapter::new();
 
+    // Load configuration
     let config = AppConfig::load(&cli.config).unwrap_or_else(|e| {
         eprintln!("Warning: Failed to load config: {}", e);
         AppConfig::default_config()
@@ -60,40 +49,13 @@ fn main() {
 
     let path = PathBuf::from(&cli.directory);
 
+    // Scan directory
     match scan_directory(&fs, &path, cli.recursive) {
         Ok(files) => {
-            let mut changed_count = 0;
-            let mut unchanged_count = 0;
+            // Business logic - rename files
+            let result = rename_files(&fs, &files, &config, cli.verbose, cli.fake);
 
-            for file_path in &files {
-                let file_name = file_path.file_name()
-                    .and_then(|n| n.to_str())
-                    .unwrap_or("");
-
-                let new_name = apply_rules(file_name, &config.rules);
-                
-                if new_name != file_name {
-                    changed_count += 1;
-                    
-                    if cli.verbose {
-                        println!("[RENAMED] {} -> {}", file_name, new_name);
-                    }
-                    
-                    if !cli.fake {
-                        let new_path = file_path.parent().unwrap().join(&new_name);
-                        if let Err(e) = fs.rename(file_path, &new_path) {
-                            eprintln!("Error renaming {:?}: {}", file_path, e);
-                        }
-                    }
-                } else {
-                    unchanged_count += 1;
-                    if cli.verbose {
-                        println!("[UNCHANGED] {}", file_name);
-                    }
-                }
-            }
-
-            println!("\nSummary: {} renamed, {} unchanged", changed_count, unchanged_count);
+            println!("\nSummary: {} renamed, {} unchanged", result.changed, result.unchanged);
             
             if cli.fake {
                 println!("(fake mode - no actual changes made)");

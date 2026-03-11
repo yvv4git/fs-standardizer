@@ -38,7 +38,7 @@ pattern = "\\._"
 replacement = "_"
 
 [[rules]]
-pattern = "_+"
+pattern = "_+ "
 replacement = "_"
 
 [[rules]]
